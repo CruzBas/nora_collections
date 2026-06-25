@@ -1,65 +1,204 @@
-import Image from "next/image";
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
+  const router = useRouter();
+  const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [remember, setRemember] = useState(false);
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    console.log("Submit:", { email, password, remember });
+    router.push("/dashboard");
+  };
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+    <div className="min-h-screen w-full flex flex-col items-center justify-center font-sans bg-slate-50 p-4 md:p-8 relative">
+      {/* Patrón de cuadrícula de fondo dinámico */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808008_1px,transparent_1px),linear-gradient(to_bottom,#80808008_1px,transparent_1px)] bg-[size:14px_24px] pointer-events-none" />
+
+      {/* Tarjeta contenedora principal */}
+      <div className="relative z-10 w-full max-w-[440px] bg-white border border-zinc-200/80 shadow-xl shadow-zinc-200/30 rounded-xl overflow-hidden flex flex-col">
+        {/* Barra de gradiente de acento superior */}
+        <div className="h-[3px] w-full bg-gradient-to-r from-blue-600 via-sky-500 to-indigo-500" />
+
+        <div className="p-8 md:p-10 flex flex-col flex-1">
+          {/* Encabezado */}
+          <div className="mb-8">
+            <h1 className="text-xl font-bold tracking-tight text-zinc-900">Portal de Acceso</h1>
+            <p className="text-xs text-zinc-500 mt-1.5 font-medium tracking-normal">
+              Inicie sesión para gestionar su ecosistema operativo.
+            </p>
+          </div>
+
+          {/* Formulario */}
+          <form onSubmit={handleSubmit} className="flex flex-col gap-6 flex-1">
+            {/* Campo de Correo Electrónico Comercial */}
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="email" className="text-[10px] font-bold tracking-widest text-zinc-400 uppercase">
+                Correo Electrónico Comercial
+              </label>
+              <div className="flex items-center gap-3 border-b border-zinc-200 focus-within:border-blue-500 transition-colors py-2">
+                <span className="text-sm font-semibold text-zinc-400 select-none">@</span>
+                <input
+                  id="email"
+                  type="email"
+                  placeholder="nombre@empresa.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  className="flex-1 bg-transparent border-0 p-0 text-sm text-zinc-800 placeholder-zinc-350 focus:outline-none focus:ring-0"
+                />
+              </div>
+            </div>
+
+            {/* Campo de Clave de Seguridad */}
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="security-key" className="text-[10px] font-bold tracking-widest text-zinc-400 uppercase">
+                Clave de Seguridad
+              </label>
+              <div className="flex items-center gap-3 border-b border-zinc-200 focus-within:border-blue-500 transition-colors py-2">
+                {/* Icono SVG de candado */}
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="w-4 h-4 text-zinc-400"
+                >
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                </svg>
+                <input
+                  id="security-key"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="flex-1 bg-transparent border-0 p-0 text-sm text-zinc-800 placeholder-zinc-350 focus:outline-none focus:ring-0 tracking-wider"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="text-zinc-400 hover:text-zinc-600 transition-colors focus:outline-none"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? (
+                    /* SVG de ojo cerrado */
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="w-4 h-4"
+                    >
+                      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+                      <line x1="1" y1="1" x2="23" y2="23" />
+                    </svg>
+                  ) : (
+                    /* SVG de ojo abierto */
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="w-4 h-4"
+                    >
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                      <circle cx="12" cy="12" r="3" />
+                    </svg>
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {/* Casilla de verificación y enlace de contraseña olvidada */}
+            <div className="flex items-center justify-between mt-2">
+              <label className="flex items-center gap-2 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={remember}
+                  onChange={(e) => setRemember(e.target.checked)}
+                  className="rounded border-zinc-300 text-blue-600 focus:ring-blue-500/30 h-3.5 w-3.5"
+                />
+                <span className="text-[11px] font-semibold text-zinc-500 tracking-wide uppercase select-none">
+                  Recordar credenciales
+                </span>
+              </label>
+              <a
+                href="#"
+                className="text-[11px] font-bold text-blue-600 hover:text-blue-700 tracking-wider uppercase transition-colors"
+              >
+                ¿Olvidó su contraseña?
+              </a>
+            </div>
+
+            {/* Botón de envío */}
+            <button
+              type="submit"
+              className="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs tracking-widest uppercase py-3.5 px-4 rounded transition-all duration-200 transform hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-blue-600/10 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+              <span>Autenticar Sistema</span>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="w-3.5 h-3.5"
+              >
+                <line x1="5" y1="12" x2="19" y2="12" />
+                <polyline points="12 5 19 12 12 19" />
+              </svg>
+            </button>
+          </form>
+
+          {/* Divisor */}
+          <div className="relative my-8">
+            <div className="absolute inset-0 flex items-center" aria-hidden="true">
+              <div className="w-full border-t border-zinc-200/60" />
+            </div>
+
+          </div>
+
+          {/* Acción secundaria (Solicitar acceso empresarial) */}
+          <button
+            type="button"
+            className="w-full border border-zinc-300 hover:border-zinc-400 text-zinc-700 hover:text-zinc-950 font-bold text-xs tracking-widest uppercase py-3 px-4 rounded transition-colors duration-200 hover:bg-zinc-50/50 focus:outline-none focus:ring-2 focus:ring-zinc-500/20 cursor-pointer text-center"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
+            Solicitar Acceso Empresarial
+          </button>
+        </div>
+
+        {/* Información/enlaces del pie de página */}
+        <div className="px-8 pb-8 pt-2 flex justify-center gap-4 text-[9px] font-bold tracking-widest text-zinc-400 uppercase select-none border-t border-zinc-100/50">
+          <a href="#" className="hover:text-zinc-600 transition-colors">
+            Protocolo de Privacidad
           </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
+          <span className="text-zinc-300">|</span>
+          <a href="#" className="hover:text-zinc-600 transition-colors">
+            Operaciones Seguras
           </a>
         </div>
-      </main>
+      </div>
     </div>
   );
+
+
 }
