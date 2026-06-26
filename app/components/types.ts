@@ -7,7 +7,7 @@ export interface CuentaCartera {
   id: string;
   cliente: string;
   ultPago: string;
-  saldoVencido: string;
+  saldoVencido: number;
   diasMora: number;
   etapa: EtapaCobranza;
 }
@@ -28,4 +28,16 @@ export interface Card {
 
 
 }
+
+export interface Persona {
+  id: string;
+  nombre: string;
+  apellidoPaterno: string;
+  apellidoMaterno: string;
+  deuda: string;
+  fechadeUltimoPago: string;
+  diasdeMora: number;
+
+}
+
 
