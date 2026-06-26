@@ -1,5 +1,4 @@
-// Componente de tarjetas de métricas del resumen operativo
-// Reutilizable a través del proyecto para mostrar cualquier indicador clave
+
 
 export default function TarjetasMetricas() {
   return (

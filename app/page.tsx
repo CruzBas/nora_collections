@@ -13,7 +13,7 @@ export default function Home() {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log("Submit:", { email, password, remember });
-    router.push("/dashboard");
+    router.push("/dashboard-recolectores");
   };
 
   return (
@@ -63,19 +63,7 @@ export default function Home() {
               </label>
               <div className="flex items-center gap-3 border-b border-zinc-200 focus-within:border-blue-500 transition-colors py-2">
                 {/* Icono SVG de candado */}
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="w-4 h-4 text-zinc-400"
-                >
-                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                  <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                </svg>
+                <span className="material-symbols-outlined">lock</span>
                 <input
                   id="security-key"
                   type={showPassword ? "text" : "password"}
@@ -93,34 +81,11 @@ export default function Home() {
                 >
                   {showPassword ? (
                     /* SVG de ojo cerrado */
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="w-4 h-4"
-                    >
-                      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
-                      <line x1="1" y1="1" x2="23" y2="23" />
-                    </svg>
+                    <span className="material-symbols-outlined">visibility_off</span>
                   ) : (
                     /* SVG de ojo abierto */
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="w-4 h-4"
-                    >
-                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                      <circle cx="12" cy="12" r="3" />
-                    </svg>
+                    <span className="material-symbols-outlined">visibility</span>
+
                   )}
                 </button>
               </div>
@@ -153,19 +118,7 @@ export default function Home() {
               className="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs tracking-widest uppercase py-3.5 px-4 rounded transition-all duration-200 transform hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-blue-600/10 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
             >
               <span>Autenticar Sistema</span>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="w-3.5 h-3.5"
-              >
-                <line x1="5" y1="12" x2="19" y2="12" />
-                <polyline points="12 5 19 12 12 19" />
-              </svg>
+              <span className="material-symbols-outlined">login</span>
             </button>
           </form>
 

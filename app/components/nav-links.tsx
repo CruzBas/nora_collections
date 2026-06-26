@@ -10,18 +10,17 @@ interface EnlaceItem {
 // Lista de enlaces principales que se muestran en el panel lateral (coincidente con la captura de pantalla)
 const enlacesPrincipales: EnlaceItem[] = [
     { nombre: "Dashboard", href: "/dashboard-recolectores", icono: "dashboard" },
-    { nombre: "Cartera", href: "/dashboard/cartera", icono: "wallet" },
-    { nombre: "Acuerdos", href: "/dashboard/acuerdos", icono: "business_center" },
+    { nombre: "Cartera", href: "/dashboard-recolectores/cartera", icono: "wallet" },
+    { nombre: "Acuerdos", href: "/dashboard-recolectores/acuerdos", icono: "business_center" },
 
 ];
 // Lista de enlaces secundarios situados en la parte inferior (coincidente con la captura de pantalla)
 const enlacesSecundarios: EnlaceItem[] = [
-    { nombre: "Ayuda", href: "/dashboard/ayuda", icono: "support" },
+    { nombre: "Ayuda", href: "/dashboard-recolectores/ayuda", icono: "support" },
     { nombre: "Cerrar Sesión", href: "/", icono: "logout" },
 ];
 export default function NavLinks() {
     const rutaActiva = usePathname();
-    // Función para renderizar el icono SVG correcto en base al identificador
 
     return (
         <div className="flex flex-col h-full bg-white border-r border-zinc-200 w-[260px] p-6 justify-between select-none">
