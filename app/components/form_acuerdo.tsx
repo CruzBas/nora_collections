@@ -22,9 +22,12 @@ export function Form_acuerdo() {
         }
     ]);
     const [persona, setPersona] = useState<CuentaCartera | null>(null);
+    const [monto, setMonto] = useState<number | ''>('');
+
     const handlePersonaChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const personaSeleccionada = cuentaCartera.find((cuenta) => cuenta.cliente === e.target.value);
+        const personaSeleccionada = cuentaCartera.find((cuenta) => cuenta.id === e.target.value);
         setPersona(personaSeleccionada || null);
+        setMonto(personaSeleccionada ? personaSeleccionada.saldoVencido : '');
     };
 
     const [cuenta, setCuenta] = useState<CuentaCartera | null>(null);
@@ -59,13 +62,15 @@ export function Form_acuerdo() {
                     {/* Monto a liquidar */}
                     <div className="flex flex-col gap-1.5">
                         <label htmlFor="monto" className="text-[10px] font-bold tracking-widest text-zinc-400 uppercase">
-                            Monto a liquidar
+                            Monto de deuda
                         </label>
                         <div className="relative">
                             <input
                                 id="monto"
                                 type='number'
-                                placeholder={`${persona?.saldoVencido}`}
+                                value={monto}
+                                onChange={(e) => setMonto(e.target.value ? Number(e.target.value) : '')}
+                                placeholder="0"
                                 className="w-full h-11 pr-10 pl-3 border border-zinc-200 rounded-lg bg-zinc-50 focus:bg-white focus:border-blue-500 text-sm text-zinc-800 placeholder:text-zinc-400 outline-none transition-all"
                                 autoComplete="off"
                             />
@@ -136,7 +141,7 @@ export function Form_acuerdo() {
                                     autoComplete="off"
                                 >
                                     <option selected disabled>Seleccione una frecuencia</option>
-                                    <option>Diario</option>
+                                    <option value="diario">Diario</option>
                                     <option value="semanal">Semanal</option>
                                     <option value="quincenal">Quincenal</option>
                                     <option value="mensual">Mensual</option>
@@ -187,7 +192,7 @@ export function Form_acuerdo() {
                                 Monto de Deuda
                             </span>
                             <span className="text-lg font-semibold text-zinc-900">
-                                {cuenta?.saldoVencido}
+                                {persona?.saldoVencido}
                             </span>
                         </div>
 
