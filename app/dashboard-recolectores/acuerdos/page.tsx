@@ -79,7 +79,7 @@ export default function Acuerdos() {
                     <h3 className="text-md text-zinc-900">Conoce los acuerdos de pago establecidos con el cliente</h3>
                     <div className="flex flex-row flex-wrap gap-3 mt-4">
                         <Card
-                            title="Metas de acuerdos"
+                            title="Monto según acuerdos"
                             value={sumaAcuerdos}
                             icon="local_atm"
                             iconFooter="arrow_upward"
@@ -96,14 +96,7 @@ export default function Acuerdos() {
                             color="border-t-green-600"
                         />
 
-                        <Card
-                            title="Tasa de cumplimiento"
-                            value="98.5%"
-                            icon="timeline"
-                            iconFooter="arrow_upward"
-                            footer="98.5% respecto al mes pasado"
-                            color="border-t-yellow-600"
-                        />
+
                     </div>
                     <div className="mt-2 w-full">
                         <TablaAcuerdos acuerdos={acuerdos} onEdit={handleEditarAcuerdo} onDelete={handleEliminarAcuerdo} />
@@ -111,9 +104,9 @@ export default function Acuerdos() {
                 </div>
 
 
-                <Form_acuerdo 
-                    acuerdoParaEditar={acuerdoEditando} 
-                    onSaved={fetchAcuerdos} 
+                <Form_acuerdo
+                    acuerdoParaEditar={acuerdoEditando}
+                    onSaved={fetchAcuerdos}
                     onLimpiar={() => setAcuerdoEditando(null)}
                     personasConAcuerdo={personasConAcuerdo}
                 />

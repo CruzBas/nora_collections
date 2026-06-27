@@ -2,59 +2,10 @@
 
 import BarraSuperior from "@/app/components/barra-superior";
 import TablaCartera from "@/app/components/tabla-cartera";
-import { CuentaCartera, EtapaCobranza } from "@/app/components/types";
+import { CuentaCartera, EtapaCobranza, Acuerdo } from "@/app/components/types";
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import Card from "@/app/components/card";
-
-const cuentasIniciales: CuentaCartera[] = [
-    {
-        id: "#AC-8921",
-        cliente: "Roberto Jiménez",
-        ultPago: "12/08/23",
-        saldoVencido: 4500.00,
-        diasMora: 90,
-        etapa: "Pre-legal",
-    },
-    {
-        id: "#AC-7743",
-        cliente: "María González",
-        ultPago: "05/09/23",
-        saldoVencido: 1200.00,
-        diasMora: 45,
-        etapa: "Seguimiento",
-    },
-    {
-        id: "#AC-9012",
-        cliente: "Empresa Logística S.A.",
-        ultPago: "20/09/23",
-        saldoVencido: 8900.50,
-        diasMora: 65,
-        etapa: "Negociación",
-    },
-    {
-        id: "#AC-3321",
-        cliente: "Luis Herrera",
-        ultPago: "--",
-        saldoVencido: 650.00,
-        diasMora: 15,
-        etapa: "Aviso",
-    }, {
-        id: "#AC-3324",
-        cliente: "Luis Herrera",
-        ultPago: "--",
-        saldoVencido: 650.00,
-        diasMora: 15,
-        etapa: "Aviso",
-    }, {
-        id: "#AC-3323",
-        cliente: "Luis Herrera",
-        ultPago: "--",
-        saldoVencido: 650.00,
-        diasMora: 15,
-        etapa: "Aviso",
-    },
-];
 
 
 export default function Cartera() {
@@ -84,6 +35,58 @@ export default function Cartera() {
         };
         fetchCuentas();
     }, []);
+
+    const [acuerdos, setAcuerdos] = useState<Acuerdo[]>([]);
+    const fetchAcuerdos = async () => {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+
+        const { data, error } = await supabase.from('acuerdos').select('*').eq('user_id', user.id);
+        if (error) {
+            console.error("Error fetching acuerdos:", error);
+        } else if (data) {
+            const mappedData: Acuerdo[] = data.map(item => ({
+                id: item.id,
+                persona: item.persona,
+                fechaVencimiento: item.fecha_vencimiento,
+                montoAcuerdo: item.monto_acuerdo,
+                fechaPago: item.fecha_pago,
+                montodeuda: item.monto_deuda,
+                cuota: item.cuota,
+                fechaAcuerdo: item.fecha_acuerdo,
+                numeroPagos: item.numero_pagos,
+                frecuencia: item.frecuencia,
+                tipoAcuerdo: item.tipo_acuerdo
+            }));
+            setAcuerdos(mappedData);
+        }
+    };
+
+    const cuentasActivas = cuentas.length;
+
+    //Suma de todos los acuerdos
+    const montoCartera = cuentas.reduce(
+        (total, cuenta) => total + Number(cuenta.saldoVencido),
+        0
+    );
+
+    //cuentas en etapa de riesgo critico
+    const cuentasRiesgoCritico = cuentas.filter(
+        (cuenta) =>
+            cuenta.etapa === "Pre-legal" ||
+            cuenta.etapa === "Aviso"
+    );
+
+    const riesgoCritico = cuentasRiesgoCritico.length;
+
+    const totalRiesgo = riesgoCritico;
+
+    useEffect(() => {
+        fetchAcuerdos();
+    }, []);
+    const acuerdosPago = acuerdos.length
+
+
 
     const cambiarEtapa = async (
         id: string,
@@ -123,7 +126,7 @@ export default function Cartera() {
 
                     <Card
                         title="Total de cuentas"
-                        value="20"
+                        value={cuentasActivas}
                         icon="groups"
                         footer="2.3%"
                         iconFooter="trending_up"
@@ -131,7 +134,7 @@ export default function Cartera() {
 
                     <Card
                         title="Monto por recuperar"
-                        value="$1,000.00"
+                        value={montoCartera}
                         icon="wallet"
                         footer="4.3%"
                         iconFooter="trending_down"
@@ -139,7 +142,7 @@ export default function Cartera() {
                     />
                     <Card
                         title="Riesgo Critico "
-                        value="3"
+                        value={riesgoCritico}
                         icon="warning"
                         footer=""
                         iconFooter=""
@@ -147,7 +150,7 @@ export default function Cartera() {
                     />
                     <Card
                         title="Promesas de pago"
-                        value="2"
+                        value={acuerdosPago}
                         icon="handshake"
                         footer=""
                         iconFooter=""
