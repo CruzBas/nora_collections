@@ -117,26 +117,7 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Casilla de verificación y enlace de contraseña olvidada */}
-            <div className="flex items-center justify-between mt-2">
-              <label className="flex items-center gap-2 cursor-pointer select-none">
-                <input
-                  type="checkbox"
-                  checked={remember}
-                  onChange={(e) => setRemember(e.target.checked)}
-                  className="rounded border-zinc-300 text-blue-600 focus:ring-blue-500/30 h-3.5 w-3.5"
-                />
-                <span className="text-[11px] font-semibold text-zinc-500 tracking-wide uppercase select-none">
-                  Recordar credenciales
-                </span>
-              </label>
-              <a
-                href="#"
-                className="text-[11px] font-bold text-blue-600 hover:text-blue-700 tracking-wider uppercase transition-colors"
-              >
-                ¿Olvidó su contraseña?
-              </a>
-            </div>
+
 
             {/* Botón de envío */}
             <button
