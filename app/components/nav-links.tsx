@@ -16,7 +16,7 @@ const enlacesPrincipales: EnlaceItem[] = [
 ];
 // Lista de enlaces secundarios situados en la parte inferior (coincidente con la captura de pantalla)
 const enlacesSecundarios: EnlaceItem[] = [
-    { nombre: "Ayuda", href: "/dashboard-recolectores/ayuda", icono: "support" },
+
     { nombre: "Cerrar Sesión", href: "/", icono: "logout" },
 ];
 export default function NavLinks() {
@@ -56,11 +56,7 @@ export default function NavLinks() {
             </nav>
             {/* Contenedor Inferior: Acción de Crear y enlaces secundarios */}
             <div className="flex flex-col gap-6 pt-6 border-t border-zinc-200">
-                {/* Botón de Creación "+ Nuevo Acuerdo" */}
-                <button className="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold py-3 px-4 rounded-lg flex items-center justify-center gap-2 shadow-md shadow-blue-600/10 active:scale-[0.98] transition-all cursor-pointer">
-                    <span className="material-symbols-outlined">add</span>
-                    <span>Nuevo Acuerdo</span>
-                </button>
+
                 {/* Enlaces secundarios (Soporte, Salida) */}
                 <div className="flex flex-col gap-1">
                     {enlacesSecundarios.map((enlace) => {

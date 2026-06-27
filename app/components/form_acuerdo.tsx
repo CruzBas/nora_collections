@@ -36,7 +36,7 @@ export function Form_acuerdo({ acuerdoParaEditar, onSaved, onLimpiar, personasCo
 
     useEffect(() => {
         if (acuerdoParaEditar) {
-            // Match by exact name, or partial (in case of "Juan Perez" vs "Juan")
+
             const personaSeleccionada = cuentaCartera.find(
                 c => c.cliente === acuerdoParaEditar.persona || acuerdoParaEditar.persona.includes(c.cliente)
             ) || null;
@@ -129,7 +129,7 @@ export function Form_acuerdo({ acuerdoParaEditar, onSaved, onLimpiar, personasCo
                         className="text-xs text-zinc-500 hover:text-zinc-800 transition-colors flex items-center gap-1"
                         title="Limpiar formulario"
                     >
-                        <span className="material-symbols-rounded text-[16px]">clear_all</span>
+                        <span className="material-symbols-outlined">delete_forever</span>
                         Limpiar
                     </button>
                 </div>
@@ -142,10 +142,9 @@ export function Form_acuerdo({ acuerdoParaEditar, onSaved, onLimpiar, personasCo
                         <select value={persona?.id || ""} className="w-full h-11 pr-10 pl-3 border border-zinc-200 rounded-lg bg-zinc-50 focus:bg-white focus:border-blue-500 text-sm text-zinc-800 placeholder:text-zinc-400 outline-none transition-all" name="Persona" id="" onChange={handlePersonaChange}>
                             <option value="" disabled>Seleccione una persona</option>
                             {cuentaCartera
-                                .filter(c => 
-                                    // Show the person if they don't have an acuerdo yet,
-                                    // OR if they are the person being edited right now
-                                    !personasConAcuerdo.includes(c.cliente) || 
+                                .filter(c =>
+
+                                    !personasConAcuerdo.includes(c.cliente) ||
                                     c.cliente === acuerdoParaEditar?.persona
                                 )
                                 .map((cuenta) => (
