@@ -101,7 +101,7 @@ export default function Cartera() {
             )
         );
 
-        // Update in Supabase
+
         const { error } = await supabase
             .from('cuenta_cartera')
             .update({ etapa })
@@ -109,7 +109,7 @@ export default function Cartera() {
 
         if (error) {
             console.error("Error updating etapa:", error);
-            // In a real app, you might revert the optimistic update here
+
         }
     };
 
@@ -127,7 +127,7 @@ export default function Cartera() {
                 pantalla={"Cartera"}
 
             />
-            <main className="p-8 flex flex-col gap-3">
+            <main className="p-8 flex flex-col flex-1 gap-3">
                 <h1 className="text-2xl font-bold text-zinc-900">Cartera de clientes</h1>
                 <h3 className="text-md  text-zinc-900">Gestion y seguimiento de cuentas asignadas</h3>
                 <div className="flex flex-row flex-wrap gap-13 mt-4 flex-1 " >

@@ -81,7 +81,7 @@ export default function Acuerdos() {
     };
 
     return (
-        <>
+        <div className="flex flex-col flex-1 min-h-screen bg-slate-50/50 text-zinc-800 pb-12 select-none">
             <BarraSuperior pantalla="Acuerdos" />
             <div className="flex flex-row flex-1 gap-2 mt-2 mb-2">
 
@@ -127,7 +127,6 @@ export default function Acuerdos() {
                     personasConAcuerdo={personasConAcuerdo}
                 />
             </div>
-
-        </>
+        </div>
     )
 }

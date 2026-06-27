@@ -14,9 +14,11 @@ export interface CuentaCartera {
 
 export interface Tarea {
   id: string;
+  user_id: string;
   nombre: string;
   descripcion: string;
-
+  fecha_creacion: string;
+  completado: boolean;
 }
 
 export interface Card {

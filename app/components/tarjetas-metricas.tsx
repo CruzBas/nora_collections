@@ -9,13 +9,7 @@ import { useRouter } from "next/navigation";
 export default function TarjetasMetricas() {
 
 
-  const [persona, setPersona] = useState<CuentaCartera | null>(null);
-  const [monto, setMonto] = useState<number | ''>('');
-  const [cuotaInicial, setCuotaInicial] = useState<number | ''>('');
-  const [fecha, setFecha] = useState<string>('');
-  const [numeroPagos, setNumeroPagos] = useState<number | ''>('');
-  const [frecuencia, setFrecuencia] = useState<string>('');
-  const [tipoPago, setTipoPago] = useState<string>('');
+
   const [cuentas, setCuentas] = useState<CuentaCartera[]>([]);
   const [tareas, setTareas] = useState<Tarea[]>([]);
   const router = useRouter();
@@ -26,25 +20,11 @@ export default function TarjetasMetricas() {
     0
   );
 
-  useEffect(() => {
-    const checkUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        router.push("/");
-      } else {
-        setUser(user);
-        fetchData(user.id);
-        fetchPagos(user.id);
-      }
-    };
-    checkUser();
-  }, [router]);
-
-
+  //fetch pagos del historial
   const fetchPagos = async (userId: string) => {
-    const { data: pagos } = await supabase.from('historial_pagos').select('*').eq('user_id', userId);
+    const { data: pagos, error } = await supabase.from('historial_pagos').select('*').eq('user_id', userId);
+    if (error) console.error('Error fetchPagos:', error);
     if (pagos) {
-
       setHistorialPago(pagos.map((item: any): HistorialPago => ({
         id: item.id,
         cuentaId: item.cuenta_id,
@@ -55,16 +35,29 @@ export default function TarjetasMetricas() {
         facturaUrl: item.factura_url,
         createdAt: item.created_at,
       })));
-
     }
+  };
 
-  }
+  //fetch Tareas pendientes
+  const fetchTareas = async (userId: string) => {
+    const { data, error } = await supabase.from('tareas').select('*').eq('user_id', userId).eq('completado', false);
+    if (error) console.error('Error fetchTareas:', error);
+    if (data) {
+      setTareas(data.map((item: any): Tarea => ({
+        id: item.id,
+        user_id: item.user_id,
+        descripcion: item.descripcion,
+        nombre: item.nombre,
+        completado: item.completado,
+        fecha_creacion: item.fecha_creacion,
+      })));
+    }
+  };
 
-
-
+  //fetch cuentas de cartera
   const fetchData = async (userId: string) => {
-    // Fetch cuentas
-    const { data: cData } = await supabase.from('cuenta_cartera').select('*').eq('user_id', userId);
+    const { data: cData, error } = await supabase.from('cuenta_cartera').select('*').eq('user_id', userId);
+    if (error) console.error('Error fetchData:', error);
     if (cData) {
       setCuentas(cData.map((item: any) => ({
         id: item.id,
@@ -75,15 +68,29 @@ export default function TarjetasMetricas() {
         etapa: item.etapa
       })));
     }
-
-    // Fetch tareas
-    const { data: tData } = await supabase.from('tareas').select('*').eq('user_id', userId).eq('completado', false);
-    if (tData) {
-      setTareas(tData);
-    }
   };
 
+  useEffect(() => {
+    const checkUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        router.push("/");
+      } else {
+        setUser(user);
+        fetchData(user.id);
+        fetchPagos(user.id);
+        fetchTareas(user.id);
+      }
+    };
+    checkUser();
+  }, [router]);
 
+  const cuentasRiesgoCritico = cuentas.filter(
+    (cuenta) =>
+      cuenta.etapa === "Pre-legal" ||
+      cuenta.etapa === "Aviso"
+  );
+  const riesgoCritico = cuentasRiesgoCritico.length;
 
   return (
     <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -114,27 +121,22 @@ export default function TarjetasMetricas() {
           </span>
         </div>
         {/* Indicador porcentual comparativo */}
-        <div>
-          <span className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 text-[10px] font-bold py-1 px-2 rounded">
-            +12%
-          </span>
-          <span className="text-[11px] text-zinc-400 font-semibold ml-2">vs mes anterior</span>
-        </div>
+
       </div>
 
-      {/* Tarjeta: Progreso de Meta con barra de avance */}
+      {/* Tarjeta: Tareas por completar */}
       <div className="bg-white border-t-[3px] border-t-blue-600 border-x border-b border-zinc-200/80 rounded-xl p-6 shadow-sm flex flex-col justify-between h-44">
         <div className="flex items-start justify-between">
-          <div className="flex flex-col gap-1 w-full">
+          <div className="flex flex-col gap-1">
             <span className="text-[10px] font-bold tracking-wider text-zinc-400 uppercase">
-              Progreso de Meta
+              Por completar
             </span>
             <div className="flex items-baseline gap-2 mt-2">
-              <span className="text-3xl font-extrabold text-zinc-950">68%</span>
-              <span className="text-xs font-semibold text-zinc-400">de $65,000.00</span>
+              <span className="text-3xl font-extrabold text-zinc-950">{tareas.length}</span>
+              <span className="text-xs font-semibold text-zinc-400">tareas pendientes</span>
             </div>
           </div>
-          {/* Ícono de bandera de meta */}
+          {/* Ícono de lista de tareas */}
           <span className="p-2 bg-blue-50 text-blue-600 rounded-lg">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -146,20 +148,20 @@ export default function TarjetasMetricas() {
               strokeLinejoin="round"
               className="w-4 h-4"
             >
-              <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" />
-              <line x1="4" y1="22" x2="4" y2="15" />
+              <line x1="8" y1="6" x2="21" y2="6" />
+              <line x1="8" y1="12" x2="21" y2="12" />
+              <line x1="8" y1="18" x2="21" y2="18" />
+              <polyline points="3 6 4 7 6 5" />
+              <polyline points="3 12 4 13 6 11" />
+              <polyline points="3 18 4 19 6 17" />
             </svg>
           </span>
         </div>
-        <div className="w-full">
-          {/* Barra de progreso visual */}
-          <div className="w-full bg-zinc-100 h-2 rounded-full overflow-hidden mb-2">
-            <div className="bg-blue-600 h-full w-[68%] rounded-full" />
-          </div>
-          <div className="flex items-center justify-between text-[10px] font-bold text-zinc-400 uppercase">
-            <span>$45,230.00</span>
-            <span>Restan $19,770.00</span>
-          </div>
+        {/* Indicador de urgencia */}
+        <div>
+          <span className="inline-flex items-center gap-1 bg-blue-50 text-blue-700 text-[10px] font-bold py-1 px-2 rounded">
+            {tareas.length === 0 ? "¡Al día!" : tareas.length > 5 ? "Atención requerida" : "En progreso"}
+          </span>
         </div>
       </div>
 
@@ -170,7 +172,7 @@ export default function TarjetasMetricas() {
             <span className="text-[10px] font-bold tracking-wider text-zinc-400 uppercase">
               Monto Pendiente (En Riesgo)
             </span>
-            <span className="text-3xl font-extrabold text-zinc-950 mt-2">$12,850.00</span>
+            <span className="text-3xl font-extrabold text-zinc-950 mt-2">{riesgoCritico}</span>
           </div>
           {/* Ícono de advertencia */}
           <span className="p-2 bg-rose-50 text-rose-500 rounded-lg">
