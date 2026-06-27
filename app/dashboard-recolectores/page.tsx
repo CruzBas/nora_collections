@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase";
 import { CuentaCartera, EtapaCobranza } from "@/app/components/types";
 import Tareas from "@/app/components/tareas";
 import BarraSuperior from "@/app/components/barra-superior";
@@ -10,55 +12,7 @@ import TablaCartera from "@/app/components/tabla-cartera";
 import ActividadHoy from "@/app/components/actividad-hoy";
 import { Tarea } from '@/app/components/types';
 
-// Datos iniciales
-const cuentasIniciales: CuentaCartera[] = [
-  {
-    id: "#AC-8921",
-    cliente: "Roberto Jiménez",
-    ultPago: "12/08/23",
-    saldoVencido: "$4,500.00",
-    diasMora: 90,
-    etapa: "Pre-legal",
-  },
-  {
-    id: "#AC-7743",
-    cliente: "María González",
-    ultPago: "05/09/23",
-    saldoVencido: "$1,200.00",
-    diasMora: 45,
-    etapa: "Seguimiento",
-  },
-  {
-    id: "#AC-9012",
-    cliente: "Empresa Logística S.A.",
-    ultPago: "20/09/23",
-    saldoVencido: "$8,900.50",
-    diasMora: 65,
-    etapa: "Negociación",
-  },
-  {
-    id: "#AC-3321",
-    cliente: "Luis Herrera",
-    ultPago: "--",
-    saldoVencido: "$650.00",
-    diasMora: 15,
-    etapa: "Aviso",
-  }, {
-    id: "#AC-3324",
-    cliente: "Luis Herrera",
-    ultPago: "--",
-    saldoVencido: "$650.00",
-    diasMora: 15,
-    etapa: "Aviso",
-  }, {
-    id: "#AC-3323",
-    cliente: "Luis Herrera",
-    ultPago: "--",
-    saldoVencido: "$650.00",
-    diasMora: 15,
-    etapa: "Aviso",
-  },
-];
+
 
 const tareasIniciales: Tarea[] = [
   {
@@ -74,12 +28,65 @@ const tareasIniciales: Tarea[] = [
 ];
 
 export default function Dashboard() {
-  const [cuentas, setCuentas] = useState(cuentasIniciales);
+  const router = useRouter();
+  const [user, setUser] = useState<any>(null);
+  const [cuentas, setCuentas] = useState<CuentaCartera[]>([]);
+  const [tareas, setTareas] = useState<Tarea[]>([]);
 
   const [cobrador, setCobrador] = useState("Todos");
   const [equipo, setEquipo] = useState("Alpha");
   const [fecha, setFecha] = useState("Octubre 2023");
   const [busqueda, setBusqueda] = useState("");
+
+  const fetchData = async (userId: string) => {
+    // Fetch cuentas
+    const { data: cData } = await supabase.from('cuenta_cartera').select('*').eq('user_id', userId);
+    if (cData) {
+      setCuentas(cData.map((item: any) => ({
+        id: item.id,
+        cliente: item.cliente,
+        ultPago: item.ult_pago,
+        saldoVencido: item.saldo_vencido,
+        diasMora: item.dias_mora,
+        etapa: item.etapa
+      })));
+    }
+
+    // Fetch tareas
+    const { data: tData } = await supabase.from('tareas').select('*').eq('user_id', userId).eq('completado', false);
+    if (tData) {
+      setTareas(tData);
+    }
+  };
+
+  useEffect(() => {
+    const checkUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        router.push("/");
+      } else {
+        setUser(user);
+        fetchData(user.id);
+      }
+    };
+    checkUser();
+  }, [router]);
+
+  const handleAddTarea = async (nombre: string, descripcion: string) => {
+    if (!user) return;
+    const newTarea = { user_id: user.id, nombre, descripcion };
+    const { data, error } = await supabase.from('tareas').insert([newTarea]).select();
+    if (!error && data) {
+      setTareas(prev => [...prev, data[0]]);
+    }
+  };
+
+  const handleCompletarTarea = async (id: string) => {
+    const { error } = await supabase.from('tareas').update({ completado: true }).eq('id', id);
+    if (!error) {
+      setTareas(prev => prev.filter(t => t.id !== id));
+    }
+  };
 
   const cambiarEtapa = (
     id: string,
@@ -117,7 +124,11 @@ export default function Dashboard() {
 
           <ActividadHoy />
 
-          <Tareas tareas={tareasIniciales} />
+          <Tareas
+            tareas={tareas}
+            onAddTarea={handleAddTarea}
+            onCompletarTarea={handleCompletarTarea}
+          />
         </div>
       </main>
     </div>

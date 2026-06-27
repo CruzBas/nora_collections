@@ -40,4 +40,19 @@ export interface Persona {
 
 }
 
+export interface Acuerdo {
+  id: string;
+  persona: string;
+  fechaVencimiento: string;
+  montoAcuerdo: string;
+  fechaPago: string;
+  montodeuda: number;
+  cuota: number,
+  fechaAcuerdo: string,
+  numeroPagos: number,
+  frecuencia: string,
+  tipoAcuerdo: string,
+
+}
+
 

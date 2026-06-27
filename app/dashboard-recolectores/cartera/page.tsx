@@ -3,7 +3,8 @@
 import BarraSuperior from "@/app/components/barra-superior";
 import TablaCartera from "@/app/components/tabla-cartera";
 import { CuentaCartera, EtapaCobranza } from "@/app/components/types";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { supabase } from "@/lib/supabase";
 import Card from "@/app/components/card";
 
 const cuentasIniciales: CuentaCartera[] = [
@@ -58,12 +59,37 @@ const cuentasIniciales: CuentaCartera[] = [
 
 export default function Cartera() {
 
-    const [cuentas, setCuentas] = useState(cuentasIniciales);
+    const [cuentas, setCuentas] = useState<CuentaCartera[]>([]);
 
-    const cambiarEtapa = (
+    useEffect(() => {
+        const fetchCuentas = async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) return;
+
+            const { data, error } = await supabase.from('cuenta_cartera').select('*').eq('user_id', user.id);
+            if (error) {
+                console.error("Error fetching cuentas:", error);
+            } else if (data) {
+                // Map snake_case to camelCase
+                const mappedData: CuentaCartera[] = data.map(item => ({
+                    id: item.id,
+                    cliente: item.cliente,
+                    ultPago: item.ult_pago,
+                    saldoVencido: item.saldo_vencido,
+                    diasMora: item.dias_mora,
+                    etapa: item.etapa
+                }));
+                setCuentas(mappedData);
+            }
+        };
+        fetchCuentas();
+    }, []);
+
+    const cambiarEtapa = async (
         id: string,
         etapa: EtapaCobranza
     ) => {
+        // Optimistic update
         setCuentas((prev) =>
             prev.map((cuenta) =>
                 cuenta.id === id
@@ -71,6 +97,17 @@ export default function Cartera() {
                     : cuenta
             )
         );
+
+        // Update in Supabase
+        const { error } = await supabase
+            .from('cuenta_cartera')
+            .update({ etapa })
+            .eq('id', id);
+
+        if (error) {
+            console.error("Error updating etapa:", error);
+            // In a real app, you might revert the optimistic update here
+        }
     };
 
     return (

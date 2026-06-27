@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase";
 
 export default function Home() {
   const router = useRouter();
@@ -9,11 +10,29 @@ export default function Home() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(false);
+  const [isLogin, setIsLogin] = useState(true);
+  const [errorMsg, setErrorMsg] = useState("");
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("Submit:", { email, password, remember });
-    router.push("/dashboard-recolectores");
+    setErrorMsg("");
+
+    if (isLogin) {
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) {
+        setErrorMsg("Error de autenticación: Verifica tus credenciales.");
+      } else {
+        router.push("/dashboard-recolectores");
+      }
+    } else {
+      const { error } = await supabase.auth.signUp({ email, password });
+      if (error) {
+        setErrorMsg(error.message);
+      } else {
+        setErrorMsg("Cuenta creada. Ahora puedes iniciar sesión.");
+        setIsLogin(true);
+      }
+    }
   };
 
   return (
@@ -29,10 +48,17 @@ export default function Home() {
         <div className="p-8 md:p-10 flex flex-col flex-1">
           {/* Encabezado */}
           <div className="mb-8">
-            <h1 className="text-xl font-bold tracking-tight text-zinc-900">Portal de Acceso</h1>
+            <h1 className="text-xl font-bold tracking-tight text-zinc-900">
+              {isLogin ? "Portal de Acceso" : "Registro de Sistema"}
+            </h1>
             <p className="text-xs text-zinc-500 mt-1.5 font-medium tracking-normal">
-              Inicie sesión para gestionar su ecosistema operativo.
+              {isLogin ? "Inicie sesión para gestionar su ecosistema operativo." : "Cree sus credenciales operativas."}
             </p>
+            {errorMsg && (
+              <p className="text-xs text-red-500 mt-3 font-medium tracking-normal bg-red-50 p-2 rounded border border-red-200">
+                {errorMsg}
+              </p>
+            )}
           </div>
 
           {/* Formulario */}
@@ -117,8 +143,8 @@ export default function Home() {
               type="submit"
               className="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs tracking-widest uppercase py-3.5 px-4 rounded transition-all duration-200 transform hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-blue-600/10 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
             >
-              <span>Autenticar Sistema</span>
-              <span className="material-symbols-outlined">login</span>
+              <span>{isLogin ? "Autenticar Sistema" : "Crear Credenciales"}</span>
+              <span className="material-symbols-outlined">{isLogin ? "login" : "person_add"}</span>
             </button>
           </form>
 
@@ -133,9 +159,13 @@ export default function Home() {
           {/* Acción secundaria (Solicitar acceso empresarial) */}
           <button
             type="button"
+            onClick={() => {
+              setIsLogin(!isLogin);
+              setErrorMsg("");
+            }}
             className="w-full border border-zinc-300 hover:border-zinc-400 text-zinc-700 hover:text-zinc-950 font-bold text-xs tracking-widest uppercase py-3 px-4 rounded transition-colors duration-200 hover:bg-zinc-50/50 focus:outline-none focus:ring-2 focus:ring-zinc-500/20 cursor-pointer text-center"
           >
-            Solicitar Acceso Empresarial
+            {isLogin ? "Solicitar Acceso Empresarial" : "Volver a Autenticar"}
           </button>
         </div>
 

@@ -39,7 +39,7 @@ export default function TablaCartera({
             <tr className="bg-zinc-50/50 border-b border-zinc-200 text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
               <th className="py-4 px-6">ID Cuenta</th>
               <th className="py-4 px-6">Cliente</th>
-              <th className="py-4 px-6">Saldo Pendiente</th>
+              <th className="py-4 px-6">Saldo de deuda</th>
               <th className="py-4 px-6 text-center">Días Mora</th>
               <th className="py-4 px-6">Etapa</th>
             </tr>
