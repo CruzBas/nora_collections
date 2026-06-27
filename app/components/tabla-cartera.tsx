@@ -1,12 +1,14 @@
 'use client'
 import { useState } from "react";
 import { CuentaCartera, EtapaCobranza } from "@/app/components/types";
+import ModalHistorialPagos from "./modal-historial-pagos";
 
 
 // Props de la tabla de cartera prioritaria
 interface TablaCarteraProps {
   cuentas: CuentaCartera[];
   onCambiarEtapa: (id: string, etapa: EtapaCobranza) => void;
+  onActualizarCuenta?: (id: string, updates: Partial<CuentaCartera>) => void;
 }
 
 
@@ -23,8 +25,12 @@ const etapas = [
 export default function TablaCartera({
   cuentas,
   onCambiarEtapa,
+  onActualizarCuenta,
 }: TablaCarteraProps) {
+  const [cuentaSeleccionada, setCuentaSeleccionada] = useState<CuentaCartera | null>(null);
+
   return (
+    <>
     <section className="bg-white border border-zinc-200/80 rounded-xl shadow-sm lg:col-span-2 overflow-hidden">
       {/* Encabezado de la sección con enlace a vista completa */}
       <div className="p-6 border-b border-zinc-200 flex items-center justify-between">
@@ -37,7 +43,7 @@ export default function TablaCartera({
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-zinc-50/50 border-b border-zinc-200 text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
-              <th className="py-4 px-6">ID Cuenta</th>
+              <th className="py-4 px-6">Pagos</th>
               <th className="py-4 px-6">Cliente</th>
               <th className="py-4 px-6">Saldo de deuda</th>
               <th className="py-4 px-6 text-center">Días Mora</th>
@@ -48,7 +54,14 @@ export default function TablaCartera({
             {cuentas.length > 0 ? (
               cuentas.map((cuenta) => (
                 <tr key={cuenta.id} className="hover:bg-zinc-50/30 transition-colors">
-                  <td className="py-4 px-6 text-sm font-semibold text-zinc-900">{cuenta.id}</td>
+                  <td className="py-4 px-6 text-sm font-semibold text-zinc-900">
+                    <button
+                      onClick={() => setCuentaSeleccionada(cuenta)}
+                      className="text-blue-600 hover:text-blue-800 font-bold transition-colors cursor-pointer"
+                    >
+                      Ver historial de pagos
+                    </button>
+                  </td>
 
                   {/* Columna de cliente con último pago registrado */}
                   <td className="py-4 px-6">
@@ -67,16 +80,19 @@ export default function TablaCartera({
                   {/* Etiqueta de días mora con color según severidad */}
                   <td className="py-4 px-6 text-center">
                     <span
-                      className={`inline-block text-[11px] font-bold px-2.5 py-0.5 rounded-full ${cuenta.diasMora >= 90
-                        ? "bg-rose-50 text-rose-600"
-                        : cuenta.diasMora >= 60
+                      className={`inline-block text-[11px] font-bold px-2.5 py-0.5 rounded-full ${
+                        Number(cuenta.saldoVencido) === 0
+                          ? "bg-emerald-50 text-emerald-700"
+                          : cuenta.diasMora >= 90
+                          ? "bg-rose-50 text-rose-600"
+                          : cuenta.diasMora >= 60
                           ? "bg-amber-50 text-amber-600"
                           : cuenta.diasMora >= 30
-                            ? "bg-blue-50 text-blue-600"
-                            : "bg-zinc-100 text-zinc-500"
-                        }`}
+                          ? "bg-blue-50 text-blue-600"
+                          : "bg-zinc-100 text-zinc-500"
+                      }`}
                     >
-                      {cuenta.diasMora}+
+                      {Number(cuenta.saldoVencido) === 0 ? "Al día" : `${cuenta.diasMora}+`}
                     </span>
                   </td>
 
@@ -108,5 +124,18 @@ export default function TablaCartera({
         </table>
       </div>
     </section>
+    {cuentaSeleccionada && (
+      <ModalHistorialPagos
+        cuenta={cuentaSeleccionada}
+        onClose={() => setCuentaSeleccionada(null)}
+        onActualizarCuenta={(id, updates) => {
+          setCuentaSeleccionada((prev) =>
+            prev && prev.id === id ? { ...prev, ...updates } : prev
+          );
+          onActualizarCuenta?.(id, updates);
+        }}
+      />
+    )}
+    </>
   );
 }

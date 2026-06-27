@@ -14,18 +14,7 @@ import { Tarea } from '@/app/components/types';
 
 
 
-const tareasIniciales: Tarea[] = [
-  {
-    id: "#AC-8921",
-    nombre: "Roberto Jiménez",
-    descripcion: "Llamada de seguimiento",
-  },
-  {
-    id: "#AC-7743",
-    nombre: "María González",
-    descripcion: "Visita a domicilio",
-  }
-];
+
 
 export default function Dashboard() {
   const router = useRouter();

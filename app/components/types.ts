@@ -55,4 +55,15 @@ export interface Acuerdo {
 
 }
 
+export interface HistorialPago {
+  id: string;
+  cuentaId?: string;
+  acuerdoId?: string;
+  userId: string;
+  fechaPago: string;
+  monto: number;
+  facturaUrl?: string;
+  createdAt: string;
+}
+
 

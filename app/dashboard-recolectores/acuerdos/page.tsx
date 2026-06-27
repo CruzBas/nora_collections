@@ -69,6 +69,17 @@ export default function Acuerdos() {
         setAcuerdoEditando(acuerdo);
     };
 
+    const actualizarAcuerdo = (id: string, updates: Partial<Acuerdo> & { deleted?: boolean }) => {
+        setAcuerdos((prev) => {
+            if (updates.deleted) {
+                return prev.filter((acuerdo) => acuerdo.id !== id);
+            }
+            return prev.map((acuerdo) =>
+                acuerdo.id === id ? { ...acuerdo, ...updates } : acuerdo
+            );
+        });
+    };
+
     return (
         <>
             <BarraSuperior pantalla="Acuerdos" />
@@ -99,7 +110,12 @@ export default function Acuerdos() {
 
                     </div>
                     <div className="mt-2 w-full">
-                        <TablaAcuerdos acuerdos={acuerdos} onEdit={handleEditarAcuerdo} onDelete={handleEliminarAcuerdo} />
+                        <TablaAcuerdos
+                            acuerdos={acuerdos}
+                            onEdit={handleEditarAcuerdo}
+                            onDelete={handleEliminarAcuerdo}
+                            onActualizarAcuerdo={actualizarAcuerdo}
+                        />
                     </div>
                 </div>
 

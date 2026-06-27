@@ -1,12 +1,27 @@
 'use client'
 import { useState } from "react";
-import { CuentaCartera, EtapaCobranza, Acuerdo } from "@/app/components/types";
+import { CuentaCartera, Acuerdo } from "@/app/components/types";
+import ModalHistorialPagos from "./modal-historial-pagos";
 
+interface TablaAcuerdosProps {
+    acuerdos: Acuerdo[];
+    onEdit: (acuerdo: Acuerdo) => void;
+    onDelete: (id: string) => void;
+    onActualizarAcuerdo?: (id: string, updates: Partial<Acuerdo> & { deleted?: boolean }) => void;
+    onActualizarCuenta?: (id: string, updates: Partial<CuentaCartera>) => void;
+}
 
-export default function TablaAcuerdos({ acuerdos, onEdit, onDelete }: { acuerdos: Acuerdo[], onEdit: (acuerdo: Acuerdo) => void, onDelete: (id: string) => void }) {
-
+export default function TablaAcuerdos({
+    acuerdos,
+    onEdit,
+    onDelete,
+    onActualizarAcuerdo,
+    onActualizarCuenta,
+}: TablaAcuerdosProps) {
+    const [acuerdoSeleccionado, setAcuerdoSeleccionado] = useState<Acuerdo | null>(null);
 
     return (
+        <>
         <section className="bg-white border border-zinc-200/80 rounded-xl shadow-sm lg:col-span-2 overflow-hidden">
             {/* Encabezado de la sección con enlace a vista completa */}
             <div className="p-6 border-b border-zinc-200 flex items-center justify-between">
@@ -19,19 +34,26 @@ export default function TablaAcuerdos({ acuerdos, onEdit, onDelete }: { acuerdos
                 <table className="w-full text-left border-collapse">
                     <thead>
                         <tr className="bg-zinc-50/50 border-b border-zinc-200 text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
+                            <th className="py-4 px-6">Pagos</th>
                             <th className="py-4 px-6">Nombre</th>
                             <th className="py-4 px-6">Fecha de Vencimiento</th>
                             <th className="py-4 px-6">Monto del Acuerdo</th>
                             <th className="py-4 px-6">Fecha de Pago</th>
                             <th className="py-4 px-6 text-center">Acciones</th>
-
-
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-zinc-100">
                         {acuerdos.length > 0 ? (
                             acuerdos.map((acuerdo) => (
                                 <tr key={acuerdo.id} className="hover:bg-zinc-50/30 transition-colors">
+                                    <td className="py-4 px-6 text-sm font-semibold text-zinc-900">
+                                        <button
+                                            onClick={() => setAcuerdoSeleccionado(acuerdo)}
+                                            className="text-blue-600 hover:text-blue-800 font-bold transition-colors cursor-pointer"
+                                        >
+                                            Ver historial de pagos
+                                        </button>
+                                    </td>
                                     <td className="py-4 px-6 text-sm font-semibold text-zinc-900">{acuerdo.persona}</td>
 
 
@@ -79,5 +101,19 @@ export default function TablaAcuerdos({ acuerdos, onEdit, onDelete }: { acuerdos
                 </table>
             </div>
         </section>
+        {acuerdoSeleccionado && (
+            <ModalHistorialPagos
+                acuerdo={acuerdoSeleccionado}
+                onClose={() => setAcuerdoSeleccionado(null)}
+                onActualizarAcuerdo={(id, updates) => {
+                    setAcuerdoSeleccionado((prev) =>
+                        prev && prev.id === id ? { ...prev, ...updates } : prev
+                    );
+                    onActualizarAcuerdo?.(id, updates);
+                }}
+                onActualizarCuenta={onActualizarCuenta}
+            />
+        )}
+        </>
     )
 }

@@ -1,6 +1,90 @@
+'use client'
+import { useState, useEffect } from "react"
+import { supabase } from "@/lib/supabase"
+import { CuentaCartera, Tarea, HistorialPago } from "./types"
+import { useRouter } from "next/navigation";
+
 
 
 export default function TarjetasMetricas() {
+
+
+  const [persona, setPersona] = useState<CuentaCartera | null>(null);
+  const [monto, setMonto] = useState<number | ''>('');
+  const [cuotaInicial, setCuotaInicial] = useState<number | ''>('');
+  const [fecha, setFecha] = useState<string>('');
+  const [numeroPagos, setNumeroPagos] = useState<number | ''>('');
+  const [frecuencia, setFrecuencia] = useState<string>('');
+  const [tipoPago, setTipoPago] = useState<string>('');
+  const [cuentas, setCuentas] = useState<CuentaCartera[]>([]);
+  const [tareas, setTareas] = useState<Tarea[]>([]);
+  const router = useRouter();
+  const [user, setUser] = useState<any>(null);
+  const [historialPago, setHistorialPago] = useState<HistorialPago[]>([]);
+  const totalPagosRealizados = historialPago.reduce(
+    (total, pago) => total + pago.monto,
+    0
+  );
+
+  useEffect(() => {
+    const checkUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        router.push("/");
+      } else {
+        setUser(user);
+        fetchData(user.id);
+        fetchPagos(user.id);
+      }
+    };
+    checkUser();
+  }, [router]);
+
+
+  const fetchPagos = async (userId: string) => {
+    const { data: pagos } = await supabase.from('historial_pagos').select('*').eq('user_id', userId);
+    if (pagos) {
+
+      setHistorialPago(pagos.map((item: any): HistorialPago => ({
+        id: item.id,
+        cuentaId: item.cuenta_id,
+        acuerdoId: item.acuerdo_id,
+        userId: item.user_id,
+        fechaPago: item.fecha_pago,
+        monto: Number(item.monto),
+        facturaUrl: item.factura_url,
+        createdAt: item.created_at,
+      })));
+
+    }
+
+  }
+
+
+
+  const fetchData = async (userId: string) => {
+    // Fetch cuentas
+    const { data: cData } = await supabase.from('cuenta_cartera').select('*').eq('user_id', userId);
+    if (cData) {
+      setCuentas(cData.map((item: any) => ({
+        id: item.id,
+        cliente: item.cliente,
+        ultPago: item.ult_pago,
+        saldoVencido: item.saldo_vencido,
+        diasMora: item.dias_mora,
+        etapa: item.etapa
+      })));
+    }
+
+    // Fetch tareas
+    const { data: tData } = await supabase.from('tareas').select('*').eq('user_id', userId).eq('completado', false);
+    if (tData) {
+      setTareas(tData);
+    }
+  };
+
+
+
   return (
     <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
       {/* Tarjeta: Monto Recuperado del Mes */}
@@ -10,7 +94,7 @@ export default function TarjetasMetricas() {
             <span className="text-[10px] font-bold tracking-wider text-zinc-400 uppercase">
               Monto Recuperado (Mes)
             </span>
-            <span className="text-3xl font-extrabold text-zinc-950 mt-2">$45,230.00</span>
+            <span className="text-3xl font-extrabold text-zinc-950 mt-2">{totalPagosRealizados.toFixed(2)}</span>
           </div>
           {/* Ícono de tendencia al alza */}
           <span className="p-2 bg-emerald-50 text-emerald-500 rounded-lg">

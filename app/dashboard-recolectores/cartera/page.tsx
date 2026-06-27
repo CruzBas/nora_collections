@@ -113,6 +113,14 @@ export default function Cartera() {
         }
     };
 
+    const actualizarCuenta = (id: string, updates: Partial<CuentaCartera>) => {
+        setCuentas((prev) =>
+            prev.map((cuenta) =>
+                cuenta.id === id ? { ...cuenta, ...updates } : cuenta
+            )
+        );
+    };
+
     return (
         <div className="flex flex-col flex-1 min-h-screen bg-slate-50/50 text-zinc-800 pb-12 select-none">
             <BarraSuperior
@@ -163,6 +171,7 @@ export default function Cartera() {
                 <TablaCartera
                     cuentas={cuentas}
                     onCambiarEtapa={cambiarEtapa}
+                    onActualizarCuenta={actualizarCuenta}
                 />
             </main>
 
